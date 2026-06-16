@@ -62,6 +62,12 @@ def accent_bar(slide, t=Inches(1.1), h=Inches(0.05)):
     bar.line.fill.background()
 
 
+def step_tag(slide, n, label):
+    """Small '1 · PROBLEM' style tag above the title."""
+    txt(slide, f"{n}  ·  {label}", Inches(0.62), Inches(0.32), Inches(8), Inches(0.4),
+        size=14, bold=True, color=ACCENT)
+
+
 def bullet_box(slide, items, l, t, w, h, size=20, color=WHITE, marker="•"):
     box = slide.shapes.add_textbox(l, t, w, h)
     box.word_wrap = True
@@ -87,8 +93,24 @@ def colored_box(slide, label, desc, l, t, w, h, box_color):
         h - Inches(0.55), size=13, color=BG, wrap=True)
 
 
+def table_2col(slide, header_l, header_r, rows, l, t, w, size=15,
+               accent=ACCENT):
+    """Simple two-column table rendered with textboxes."""
+    col_w = w // 2
+    # headers
+    txt(slide, header_l, l, t, col_w, Inches(0.4), size=size + 1, bold=True, color=accent)
+    txt(slide, header_r, l + col_w, t, col_w, Inches(0.4), size=size + 1, bold=True, color=accent)
+    row_h = Inches(0.62)
+    for i, (a, b) in enumerate(rows):
+        y = t + Inches(0.5) + i * row_h
+        txt(slide, a, l, y, col_w - Inches(0.1), row_h, size=size, color=WHITE)
+        txt(slide, b, l + col_w, y, col_w - Inches(0.1), row_h, size=size, color=GRAY)
+
+
 # ===========================================================================
-# Slides
+# Slides — Executive Storyline structure
+#   Title → Problem → Value → Approach+Demo → Risk & Control →
+#   Implementation Path → Q&A Buffer (appendix)
 # ===========================================================================
 
 prs = new_prs()
@@ -100,11 +122,11 @@ s = blank_slide(prs)
 bg(s)
 txt(s, "Project Knowledge Hub", Inches(0.6), Inches(1.8), Inches(12), Inches(1.2),
     size=52, bold=True, color=WHITE, align=PP_ALIGN.CENTER)
-txt(s, "RAG-powered Q&A over your project documentation",
-    Inches(0.6), Inches(3.1), Inches(12), Inches(0.7),
-    size=26, color=ACCENT, align=PP_ALIGN.CENTER)
-txt(s, "AI for Engineering  ·  2025",
-    Inches(0.6), Inches(4.2), Inches(12), Inches(0.5),
+txt(s, "Ask your project documents in natural language — get cited, trustworthy answers",
+    Inches(0.6), Inches(3.1), Inches(12), Inches(0.9),
+    size=22, color=ACCENT, align=PP_ALIGN.CENTER)
+txt(s, "Advanced AI Engineering  ·  BOI STEM++",
+    Inches(0.6), Inches(4.3), Inches(12), Inches(0.5),
     size=18, color=GRAY, align=PP_ALIGN.CENTER)
 
 # ---------------------------------------------------------------------------
@@ -112,174 +134,199 @@ txt(s, "AI for Engineering  ·  2025",
 # ---------------------------------------------------------------------------
 s = blank_slide(prs)
 bg(s)
-txt(s, "The Problem", Inches(0.6), Inches(0.4), Inches(10), Inches(0.7),
-    size=36, bold=True, color=WHITE)
-accent_bar(s)
+step_tag(s, "1", "PROBLEM")
+txt(s, "Project knowledge is scattered — and it costs us", Inches(0.6), Inches(0.7), Inches(12), Inches(0.7),
+    size=32, bold=True, color=WHITE)
+accent_bar(s, t=Inches(1.45))
 
 bullet_box(s, [
-    "Developers repeatedly ask the same questions about system design, API contracts, and requirements",
-    "Knowledge is scattered across files, chat threads, and people — no single source of truth",
-    "PM / BA / SA spend significant time re-answering questions that are already documented",
-    "A frontend dev who needs API field names must interrupt a backend dev — or dig through documents manually",
-], Inches(0.6), Inches(1.4), Inches(12), Inches(4.5), size=22)
+    "Developers repeatedly ask the same questions — API fields, design decisions, requirements",
+    "Knowledge hand-off falls through the cracks: PM / BA / SA → dev, and backend → frontend",
+    "When someone leaves, their knowledge leaves with them",
+    "No single source of truth — it lives in docs, chat threads, and people's heads",
+], Inches(0.6), Inches(1.8), Inches(12), Inches(3.2), size=21)
 
-txt(s, "Result: duplicated effort, slower delivery, and documentation gaps that compound over time.",
-    Inches(0.6), Inches(6.1), Inches(12), Inches(0.8),
-    size=18, color=YELLOW)
-
-# ---------------------------------------------------------------------------
-# 3. Solution
-# ---------------------------------------------------------------------------
-s = blank_slide(prs)
-bg(s)
-txt(s, "The Solution", Inches(0.6), Inches(0.4), Inches(10), Inches(0.7),
-    size=36, bold=True, color=WHITE)
-accent_bar(s)
-
-txt(s, "A centralised knowledge hub where developers ask questions in natural language — and get answers grounded in the actual project documents.",
-    Inches(0.6), Inches(1.3), Inches(12), Inches(1.0), size=20, color=WHITE)
-
-colored_box(s, "✅  Found",
-    "Answer drawn from documents,\nwith a clickable source citation",
-    Inches(0.5), Inches(2.6), Inches(3.7), Inches(2.2), GREEN)
-
-colored_box(s, "⚠️  Not Found (Abstain)",
-    'System says "not in documents"\ninstead of guessing',
-    Inches(4.5), Inches(2.6), Inches(3.9), Inches(2.2), YELLOW)
-
-colored_box(s, "⚡  Conflict Detected",
-    "Two sources disagree — both sides\nshown, system does not choose",
-    Inches(8.6), Inches(2.6), Inches(4.2), Inches(2.2), RED)
-
-txt(s, "Two design principles:   answer from documents only + always cite  ·  abstention is a feature, not a failure",
-    Inches(0.6), Inches(5.2), Inches(12), Inches(0.6), size=16, color=GRAY)
+txt(s, "Impact:  slower delivery  ·  long onboarding  ·  repeated Q&A drains the team every week",
+    Inches(0.6), Inches(5.6), Inches(12), Inches(0.8),
+    size=19, color=YELLOW)
 
 # ---------------------------------------------------------------------------
-# 4. Architecture
+# 3. Value
 # ---------------------------------------------------------------------------
 s = blank_slide(prs)
 bg(s)
-txt(s, "Architecture", Inches(0.6), Inches(0.4), Inches(10), Inches(0.7),
-    size=36, bold=True, color=WHITE)
-accent_bar(s)
+step_tag(s, "2", "VALUE")
+txt(s, "One place to ask — answers from real documents", Inches(0.6), Inches(0.7), Inches(12), Inches(0.7),
+    size=32, bold=True, color=WHITE)
+accent_bar(s, t=Inches(1.45))
 
-# Ingestion row
-txt(s, "INGESTION", Inches(0.6), Inches(1.3), Inches(2), Inches(0.4),
-    size=13, bold=True, color=ACCENT)
+table_2col(s, "Outcome", "How we measure it", [
+    ("Devs self-serve answers, stop interrupting others", "Fewer repeated questions / hours saved"),
+    ("New hires get productive faster", "Time-to-productive for onboarding"),
+    ("Knowledge survives staff turnover", "Questions answerable from documents"),
+    ("Surface where documentation is missing", "Gap report (questions the system abstains on)"),
+], Inches(0.6), Inches(1.9), Inches(12.1), size=18)
+
+# ---------------------------------------------------------------------------
+# 4a. Approach
+# ---------------------------------------------------------------------------
+s = blank_slide(prs)
+bg(s)
+step_tag(s, "3", "APPROACH")
+txt(s, "RAG: answer only from our documents, always cite", Inches(0.6), Inches(0.7), Inches(12), Inches(0.7),
+    size=30, bold=True, color=WHITE)
+accent_bar(s, t=Inches(1.45))
+
+# Query flow diagram
 for i, (label, x) in enumerate([
-    ("Upload\n(MD / TXT / PDF)", 0.6),
-    ("Parse &\nChunk", 3.0),
-    ("Embed\n(multilingual-e5)", 5.4),
-    ("ChromaDB\n(vector store)", 7.8),
+    ("User\nQuestion", 0.6),
+    ("Retrieve\nrelevant chunks", 3.0),
+    ("Augment prompt\n+ instructions", 5.4),
+    ("LLM\nGenerate", 7.8),
+    ("Answer +\nCitation", 10.2),
 ]):
-    box = s.shapes.add_shape(1, Inches(x), Inches(1.75), Inches(2.1), Inches(1.0))
+    box = s.shapes.add_shape(1, Inches(x), Inches(1.9), Inches(2.1), Inches(1.0))
     box.fill.solid()
     box.fill.fore_color.rgb = RGBColor(0x1E, 0x3A, 0x5F)
     box.line.color.rgb = ACCENT
-    txt(s, label, Inches(x + 0.1), Inches(1.8), Inches(1.9), Inches(0.9),
-        size=14, color=WHITE, align=PP_ALIGN.CENTER)
-    if i < 3:
-        txt(s, "→", Inches(x + 2.15), Inches(2.0), Inches(0.5), Inches(0.5),
+    txt(s, label, Inches(x + 0.1), Inches(1.95), Inches(1.9), Inches(0.9),
+        size=13, color=WHITE, align=PP_ALIGN.CENTER)
+    if i < 4:
+        txt(s, "→", Inches(x + 2.15), Inches(2.2), Inches(0.5), Inches(0.5),
             size=20, color=ACCENT, align=PP_ALIGN.CENTER)
 
-# Query row
-txt(s, "QUERY", Inches(0.6), Inches(3.2), Inches(2), Inches(0.4),
-    size=13, bold=True, color=GREEN)
-for i, (label, x) in enumerate([
-    ("User\nQuestion", 0.6),
-    ("Embed\nQuery", 3.0),
-    ("Similarity\nSearch (top-k)", 5.4),
-    ("LLM +\nPrompt", 7.8),
-    ("Answer +\nCitation", 10.2),
-]):
-    box = s.shapes.add_shape(1, Inches(x), Inches(3.65), Inches(2.1), Inches(1.0))
-    box.fill.solid()
-    box.fill.fore_color.rgb = RGBColor(0x0F, 0x2E, 0x1A)
-    box.line.color.rgb = GREEN
-    txt(s, label, Inches(x + 0.1), Inches(3.7), Inches(1.9), Inches(0.9),
-        size=14, color=WHITE, align=PP_ALIGN.CENTER)
-    if i < 4:
-        txt(s, "→", Inches(x + 2.15), Inches(3.95), Inches(0.5), Inches(0.5),
-            size=20, color=GREEN, align=PP_ALIGN.CENTER)
-
-# Tech stack
-txt(s, "Streamlit  ·  ChromaDB  ·  sentence-transformers (multilingual-e5-small)  ·  OpenAI-compatible LLM via GitHub Models  ·  PyMuPDF",
-    Inches(0.6), Inches(5.3), Inches(12), Inches(0.5),
-    size=15, color=GRAY, align=PP_ALIGN.CENTER)
-
-txt(s, "Entirely free to run  ·  No paid API required during development",
-    Inches(0.6), Inches(5.9), Inches(12), Inches(0.5),
-    size=15, color=ACCENT, align=PP_ALIGN.CENTER)
+txt(s, "Data & boundary", Inches(0.6), Inches(3.4), Inches(12), Inches(0.5),
+    size=18, bold=True, color=ACCENT)
+bullet_box(s, [
+    "Answers come only from documents imported into the system (one project)",
+    "The model is constrained to the retrieved context — it does not use general knowledge",
+    "Every answer carries a citation — the user can verify the source",
+], Inches(0.6), Inches(3.9), Inches(12), Inches(2.2), size=19)
 
 # ---------------------------------------------------------------------------
-# 5. Demo
+# 4b. Demo
 # ---------------------------------------------------------------------------
 s = blank_slide(prs)
 bg(s)
-txt(s, "Demo", Inches(0.6), Inches(0.4), Inches(10), Inches(0.7),
-    size=36, bold=True, color=WHITE)
-accent_bar(s)
+step_tag(s, "3", "APPROACH  ·  LIVE DEMO")
+txt(s, "Three behaviors that make it trustworthy", Inches(0.6), Inches(0.7), Inches(12), Inches(0.7),
+    size=30, bold=True, color=WHITE)
+accent_bar(s, t=Inches(1.45))
 
 scenarios = [
     (GREEN,  "✅  Found",
-     'Q: "What fields does the Order API return?"\n→  Answer with source citation\n     (api-spec.md › Order Endpoints)'),
+     'Q: "What fields does the Order API return?"\n→  Answer + clickable citation\n     (api-spec.md › Order Endpoints)'),
     (YELLOW, "⚠️  Abstain",
-     'Q: "Does the system support GDPR?"\n→  "ไม่พบข้อมูลเรื่องนี้ในเอกสาร"\n     No hallucination.'),
+     'Q: "Does the system support GDPR?"\n→  "ไม่พบข้อมูลในเอกสาร"\n     No guessing.'),
     (RED,    "⚡  Conflict",
-     'Q: "What is the payment timeout?"\n→  api-spec.md says 30s\n     system-architecture.md says 60s\n     Both shown. No winner picked.'),
+     'Q: "What is the payment timeout?"\n→  api-spec.md says 30s\n     architecture.md says 60s\n     Both shown. No winner picked.'),
 ]
 for i, (color, title, body) in enumerate(scenarios):
     x = Inches(0.5 + i * 4.25)
-    box = s.shapes.add_shape(1, x, Inches(1.4), Inches(4.0), Inches(4.5))
+    box = s.shapes.add_shape(1, x, Inches(1.8), Inches(4.0), Inches(4.0))
     box.fill.solid()
     box.fill.fore_color.rgb = RGBColor(0x1A, 0x22, 0x3A)
     box.line.color.rgb = color
-    txt(s, title, x + Inches(0.15), Inches(1.5), Inches(3.7), Inches(0.5),
+    txt(s, title, x + Inches(0.15), Inches(1.9), Inches(3.7), Inches(0.5),
         size=18, bold=True, color=color)
-    txt(s, body, x + Inches(0.15), Inches(2.1), Inches(3.7), Inches(3.5),
-        size=16, color=WHITE, wrap=True)
+    txt(s, body, x + Inches(0.15), Inches(2.5), Inches(3.7), Inches(3.2),
+        size=15, color=WHITE, wrap=True)
 
-txt(s, "Documents page: upload MD / TXT / PDF  ·  view indexed files  ·  delete to remove from vector store",
-    Inches(0.6), Inches(6.2), Inches(12), Inches(0.5),
-    size=15, color=GRAY, align=PP_ALIGN.CENTER)
+txt(s, 'Design principle:  "abstention is a feature, not a failure" — a system that guesses confidently is more dangerous than one that says "I don\'t know"',
+    Inches(0.6), Inches(6.1), Inches(12), Inches(0.8), size=15, color=GRAY)
 
 # ---------------------------------------------------------------------------
-# 6. Future Directions
+# 5. Risk & Control
 # ---------------------------------------------------------------------------
 s = blank_slide(prs)
 bg(s)
-txt(s, "Future Directions", Inches(0.6), Inches(0.4), Inches(10), Inches(0.7),
-    size=36, bold=True, color=WHITE)
-accent_bar(s)
+step_tag(s, "4", "RISK & CONTROL")
+txt(s, "Risk doesn't mean forbidden — it means controlled", Inches(0.6), Inches(0.7), Inches(12), Inches(0.7),
+    size=30, bold=True, color=WHITE)
+accent_bar(s, t=Inches(1.45))
 
-cols = [
-    (ACCENT, "Deeper Intelligence", [
-        "Documentation Gap Report — rank unanswered topics so teams know what's missing",
-        "Corpus-wide conflict detection — scan entire knowledge base, not just retrieved chunks",
-        "Cross-file reasoning — answers that synthesise information across multiple documents",
-    ]),
-    (GREEN, "Richer Sources", [
-        "Raw codebase indexing — chunk by function boundary, auto-generate API reference docs",
-        "Hybrid search — keyword + semantic for precise variable / function name lookups",
-        "Auto-sync with git — re-index on every push, keep answers current",
-    ]),
-    (YELLOW, "Team & Enterprise", [
-        "PM / BA / SA self-service upload — owners manage their own documents",
-        "Multi-project support — separate knowledge bases per team or service",
-        "Integration with Jira, Confluence, Slack — meet developers where they work",
-    ]),
+# three-column header
+headers = ["Risk", "Control", "Owner"]
+xs = [0.6, 6.0, 11.0]
+ws = [5.3, 4.9, 1.8]
+for hx, hw, htext in zip(xs, ws, headers):
+    txt(s, htext, Inches(hx), Inches(1.7), Inches(hw), Inches(0.4),
+        size=16, bold=True, color=ACCENT)
+
+rows = [
+    ("Hallucination (made-up answers)", "Answer-from-docs only + forced citation + abstain", "Dev team"),
+    ("Data leakage", "MVP uses mock data; production → paid/self-host", "Data owner"),
+    ("Wrong info used in production", "Every answer cited — user verifies before use", "User"),
+    ("Access boundary", "One project; future: per-user access control", "Admin"),
+    ("Conflicting documents", "System reports conflict, does not decide", "User"),
 ]
-for i, (color, title, items) in enumerate(cols):
-    x = Inches(0.4 + i * 4.3)
-    header = s.shapes.add_shape(1, x, Inches(1.4), Inches(4.0), Inches(0.5))
-    header.fill.solid()
-    header.fill.fore_color.rgb = color
-    header.line.fill.background()
-    txt(s, title, x + Inches(0.1), Inches(1.45), Inches(3.8), Inches(0.45),
-        size=16, bold=True, color=BG, align=PP_ALIGN.CENTER)
-    bullet_box(s, items, x, Inches(2.0), Inches(4.1), Inches(4.5),
-               size=15, color=WHITE)
+for i, (a, b, c) in enumerate(rows):
+    y = Inches(2.2) + i * Inches(0.78)
+    txt(s, a, Inches(0.6), y, Inches(5.3), Inches(0.75), size=14, color=WHITE)
+    txt(s, b, Inches(6.0), y, Inches(4.9), Inches(0.75), size=14, color=GRAY)
+    txt(s, c, Inches(11.0), y, Inches(1.8), Inches(0.75), size=14, color=GREEN)
+
+# ---------------------------------------------------------------------------
+# 6. Implementation Path
+# ---------------------------------------------------------------------------
+s = blank_slide(prs)
+bg(s)
+step_tag(s, "5", "IMPLEMENTATION PATH")
+txt(s, "Pilot in 2 weeks, then scale", Inches(0.6), Inches(0.7), Inches(12), Inches(0.7),
+    size=32, bold=True, color=WHITE)
+accent_bar(s, t=Inches(1.45))
+
+# Pilot column
+header = s.shapes.add_shape(1, Inches(0.5), Inches(1.8), Inches(6.0), Inches(0.5))
+header.fill.solid(); header.fill.fore_color.rgb = ACCENT; header.line.fill.background()
+txt(s, "Pilot  ·  2 weeks", Inches(0.6), Inches(1.85), Inches(5.8), Inches(0.45),
+    size=17, bold=True, color=BG)
+bullet_box(s, [
+    "One project, seed 5–10 real documents (no sensitive data)",
+    "Build a golden question set (15–20) from questions devs actually ask",
+    "Measure: ≥70–80% correct + every answer cited + correct abstention",
+], Inches(0.55), Inches(2.45), Inches(6.1), Inches(3.5), size=17)
+
+# Scale column
+header = s.shapes.add_shape(1, Inches(6.9), Inches(1.8), Inches(6.0), Inches(0.5))
+header.fill.solid(); header.fill.fore_color.rgb = GREEN; header.line.fill.background()
+txt(s, "Scale", Inches(7.0), Inches(1.85), Inches(5.8), Inches(0.45),
+    size=17, bold=True, color=BG)
+bullet_box(s, [
+    "Move to persistent storage + paid / self-hosted model (privacy)",
+    "Support multiple projects + per-user access control",
+    "Add gap report, code indexing, auto-sync with git",
+], Inches(6.95), Inches(2.45), Inches(6.0), Inches(3.5), size=17)
+
+txt(s, "MVP runs at zero cost today. Production investment is a deliberate, measured next step.",
+    Inches(0.6), Inches(6.2), Inches(12), Inches(0.6), size=16, color=ACCENT)
+
+# ---------------------------------------------------------------------------
+# 7. Q&A Buffer (appendix — not presented, used to answer questions)
+# ---------------------------------------------------------------------------
+s = blank_slide(prs)
+bg(s)
+step_tag(s, "+", "APPENDIX  ·  Q&A BUFFER")
+txt(s, "Anticipated questions", Inches(0.6), Inches(0.7), Inches(12), Inches(0.7),
+    size=30, bold=True, color=WHITE)
+accent_bar(s, t=Inches(1.45))
+
+qa = [
+    ("How is this different from ChatGPT?",
+     "ChatGPT can guess, sends data outside the org, and you can't control its behavior. Ours answers only from our documents, always cites, lets us control retrieval / abstain / conflict, and can be deployed in our own infrastructure."),
+    ("Can't ChatGPT also abstain if instructed?",
+     "Yes — but for us it's a guaranteed default, it's measurable, and we control retrieval ourselves (including Thai-language matching). ChatGPT's file upload doesn't expose those knobs."),
+    ("Then why not just use ChatGPT?",
+     "Privacy + retrieval control (Thai) + conflict mode + the ability to integrate into our own workflow and infrastructure."),
+]
+y = 1.9
+for q, a in qa:
+    txt(s, f"Q  {q}", Inches(0.6), Inches(y), Inches(12), Inches(0.5),
+        size=18, bold=True, color=ACCENT)
+    txt(s, f"A  {a}", Inches(0.6), Inches(y + 0.5), Inches(12), Inches(1.1),
+        size=15, color=WHITE)
+    y += 1.75
 
 
 prs.save("knowledge-hub-pitch.pptx")
-print("Saved: knowledge-hub-pitch.pptx")
+print("Saved: knowledge-hub-pitch.pptx  (7 slides, Executive Storyline structure)")
